@@ -19,87 +19,123 @@
         box-sizing: border-box;
       }
 
+      /* Notion Light Theme */
+      :root {
+        --notion-bg: #ffffff;
+        --notion-bg-hover: rgba(55, 53, 47, 0.08);
+        --notion-text: #37352f;
+        --notion-text-secondary: rgba(55, 53, 47, 0.65);
+        --notion-border: rgba(55, 53, 47, 0.16);
+        --notion-shadow: rgba(15, 15, 15, 0.1);
+      }
+
+      /* Notion Dark Theme */
+      [data-theme="dark"] {
+        --notion-bg: #191919;
+        --notion-bg-hover: rgba(255, 255, 255, 0.055);
+        --notion-text: rgba(255, 255, 255, 0.9);
+        --notion-text-secondary: rgba(255, 255, 255, 0.6);
+        --notion-border: rgba(255, 255, 255, 0.13);
+        --notion-shadow: rgba(0, 0, 0, 0.3);
+      }
+
+      html,
       body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: transparent;
-        padding: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        --bg-primary: transparent;
-        --bg-secondary: rgba(128, 128, 128, 0.1);
-        --border-color: rgba(128, 128, 128, 0.2);
-        --border-hover: rgba(128, 128, 128, 0.3);
-        --text-primary: currentColor;
-        --shadow: rgba(0, 0, 0, 0.05);
+        height: 100%;
+        width: 100%;
+      }
+
+      body {
+        font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", Helvetica, "Apple Color Emoji", Arial, sans-serif,
+          "Segoe UI Emoji", "Segoe UI Symbol";
+        background: var(--notion-bg);
+        color: var(--notion-text);
+        padding: 12px 16px;
       }
 
       .container {
         width: 100%;
-        max-width: 600px;
+        max-width: 100%;
       }
 
       .header {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 16px;
+        margin-bottom: 12px;
       }
 
       h1 {
-        font-size: 18px;
-        font-weight: 600;
-        color: var(--text-primary);
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--notion-text-secondary);
         letter-spacing: -0.01em;
       }
 
       .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+      }
+
+      @media (min-width: 400px) {
+        .grid {
+          grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        }
+      }
+
+      @media (min-width: 600px) {
+        .grid {
+          grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+          gap: 10px;
+        }
       }
 
       .launch-btn {
-        background: var(--bg-primary);
-        border: 1px solid var(--border-color);
-        border-radius: 6px;
-        padding: 16px;
+        background: transparent;
+        border: 1px solid var(--notion-border);
+        border-radius: 4px;
+        padding: 12px 8px;
         text-align: center;
         cursor: pointer;
-        transition: all 0.2s ease;
+        transition: background 80ms ease-in;
         text-decoration: none;
-        color: var(--text-primary);
+        color: var(--notion-text);
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 10px;
+        gap: 6px;
       }
 
       .launch-btn:hover {
-        background: var(--bg-secondary);
-        border-color: var(--border-hover);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 8px var(--shadow);
+        background: var(--notion-bg-hover);
+      }
+
+      .launch-btn:active {
+        background: var(--notion-bg-hover);
+        transform: scale(0.98);
       }
 
       .icon {
-        font-size: 28px;
-        color: var(--text-primary);
+        font-size: 22px;
+        color: var(--notion-text);
+        opacity: 0.85;
       }
 
       .label {
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 400;
+        color: var(--notion-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
       }
     </style>
   </head>
   <body>
     <div class="container">
-      <div class="header">
-        <h1>Quick Launch</h1>
-      </div>
       <div class="grid">
         <a href="https://www.codewars.com" target="_blank" class="launch-btn">
           <i class="lni lni-code-1 icon"></i>
@@ -165,5 +201,47 @@
         </a>
       </div>
     </div>
+    <script>
+      function detectTheme() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const themeParam = urlParams.get("theme");
+        if (themeParam === "dark") {
+          return "dark";
+        } else if (themeParam === "light") {
+          return "light";
+        }
+
+        if (
+          window.matchMedia &&
+          window.matchMedia("(prefers-color-scheme: dark)").matches
+        ) {
+          return "dark";
+        }
+
+        return "light";
+      }
+
+      function applyTheme(theme) {
+        if (theme === "dark") {
+          document.documentElement.setAttribute("data-theme", "dark");
+        } else {
+          document.documentElement.removeAttribute("data-theme");
+        }
+      }
+
+      applyTheme(detectTheme());
+
+      if (window.matchMedia) {
+        window
+          .matchMedia("(prefers-color-scheme: dark)")
+          .addEventListener("change", (e) => {
+            // Only auto-switch if no URL param is set
+            const urlParams = new URLSearchParams(window.location.search);
+            if (!urlParams.get("theme")) {
+              applyTheme(e.matches ? "dark" : "light");
+            }
+          });
+      }
+    </script>
   </body>
 </html>
